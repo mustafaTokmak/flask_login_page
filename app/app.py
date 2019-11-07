@@ -6,7 +6,8 @@ import time
 import json
 app = Flask(__name__)
 
-
+from flask_cors import CORS
+CORS(app)
 @app.route('/')
 def welcome():  
     return redirect('/login')
@@ -230,15 +231,16 @@ def redirect_kemal_fail():
 
 @app.route('/log', methods=['GET', 'POST'])
 def log():
-    if request.method == 'POST':
-        content = request.get_json()
-        with open('log.txt',"a") as f:
-            f.write("cikis,"+"mustafa,"+"qr_reader,"+str(time.ctime())+", "+str(time.time())+str("\n"))
-        return "True"
     if request.method == 'GET':
         with open('log.txt',"r") as f:
             data = f.readlines()
         return json.dumps(data,indent=4)
+    else:
+        content = request.get_json()
+        print(content)
+        with open('log.txt',"a") as f:
+            f.write("cikis,"+"mustafa,"+"qr_reader,"+str(time.ctime())+", "+str(time.time())+str("\n"))
+        return "True"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4545,debug=True)
