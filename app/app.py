@@ -2,7 +2,8 @@
     Created by nguyenvanhieu.vn at 9/16/2018
 """
 from flask import Flask, render_template, redirect, url_for, request
-
+import time
+import json
 app = Flask(__name__)
 
 
@@ -81,8 +82,12 @@ def mustafa():
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
         result = response.json()['result']
         if(result == 'True'):
+            with open("log.txt","a") as f:
+                f.write("cikis,"+"mustafa,"+"otp,"+"True,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return render_template('resultsuccess.html', error=error)
         else:
+            with open("log.txt","a") as f:
+                f.write("cikis,"+"mustafa,"+"otp,"+"False,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return render_template('resultfail.html', error=error)
         return otp
     return render_template('mustafa_otp.html', error=error)
@@ -108,8 +113,12 @@ def kemal_long():
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
         result = response.json()['result']
         if(result == 'True'):
+            with open("log.txt","a") as f:
+                f.write("cikis,"+"kemal,"+"otp_long,"+"True,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return render_template('resultsuccess.html', error=error)
         else:
+            with open("log.txt","a") as f:
+                f.write("cikis,"+"kemal,"+"otp_long,"+"True,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return render_template('resultfail.html', error=error)
         return otp
     return render_template('kemal_otp_long.html', error=error)
@@ -136,9 +145,14 @@ def mustafa_long():
 
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
         result = response.json()['result']
+        
         if(result == 'True'):
+            with open("log.txt","a") as f:
+                f.write("cikis,"+"mustafa,"+"otp_long,"+"True,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return render_template('resultsuccess.html', error=error)
         else:
+            with open("log.txt","a") as f:
+                f.write("cikis,"+"mustafa,"+"otp_long,"+"False,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return render_template('resultfail.html', error=error)
     return render_template('mustafa_otp_long.html', error=error)
 
@@ -148,11 +162,17 @@ def redirect_mustafa():
     error = None
     if request.method == 'POST':
         if request.form['submit_button'] == 'Qr_Reader':
+            with open("log.txt","a") as f:
+                f.write("giris,"+"mustafa,"+"qr_reader,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return redirect("http://srv.biyosecure.com:4747",302)
             print("srv")
         elif request.form['submit_button'] == 'Otp':
+            with open("log.txt","a") as f:
+                f.write("giris,"+"mustafa,"+"otp,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return redirect('/mustafa')
         elif request.form['submit_button'] == 'Otp_Long' :
+            with open("log.txt","a") as f:
+                f.write("giris,"+"mustafa,"+"otp_long,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return redirect('/mustafa_long')
     return render_template('redirect_mustafa.html', error=error)
 
@@ -161,14 +181,65 @@ def redirect_kemal():
     error = None
     if request.method == 'POST':
         if request.form['submit_button'] == 'Qr_Reader':
+            with open("log.txt","a") as f:
+                f.write("giris,"+"kemal,"+"qr_reader,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return redirect("http://srv.biyosecure.com:4748",302)
         elif request.form['submit_button'] == 'Otp':
+            with open("log.txt","a") as f:
+                f.write("giris,"+"kemal,"+"otp,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return redirect('/kemal')
         elif request.form['submit_button'] == 'Otp_Long' :
+            with open("log.txt","a") as f:
+                f.write("giris,"+"kemal,"+"otp_long,"+str(time.ctime())+", "+str(time.time())+str("\n"))
             return redirect('/kemal_long')
 
     
     return render_template('redirect_kemal.html', error=error)
 
+
+@app.route('/redirect_mustafa_success', methods=['GET', 'POST'])
+def redirect_mustafa_success():
+    error = None
+    with open("log.txt","a") as f:
+        f.write("cikis,"+"mustafa,"+"qr_reader,"+"True,"+str(time.ctime())+", "+str(time.time())+str("\n"))
+    return render_template('resultsuccess.html', error=error)
+
+
+@app.route('/redirect_kemal_success', methods=['GET', 'POST'])
+def redirect_kemal_success():
+    error = None
+    with open("log.txt","a") as f:
+        f.write("cikis,"+"kemal,"+"qr_reader,"+"True,"+str(time.ctime())+", "+str(time.time())+str("\n"))
+    return render_template('resultsuccess.html', error=error)
+
+
+@app.route('/redirect_mustafa_fail', methods=['GET', 'POST'])
+def redirect_mustafa_fail():
+    error = None
+    with open("log.txt","a") as f:
+        f.write("cikis,"+"mustafa,"+"qr_reader,"+"False,"+str(time.ctime())+", "+str(time.time())+str("\n"))
+    return render_template('resultfail.html', error=error)
+
+@app.route('/redirect_kemal_fail', methods=['GET', 'POST'])
+def redirect_kemal_fail():
+    error = None
+    with open("log.txt","a") as f:
+        f.write("cikis,"+"kemal,"+"qr_reader,"+"False,"+str(time.ctime())+", "+str(time.time())+str("\n"))
+    return render_template('resultfail.html', error=error)
+
+
+@app.route('/log', methods=['GET', 'POST'])
+def log():
+    if request.method == 'POST':
+        content = request.get_json()
+        with open('log.txt',"a") as f:
+            f.write("cikis,"+"mustafa,"+"qr_reader,"+str(time.ctime())+", "+str(time.time())+str("\n"))
+        return "True"
+    if request.method == 'GET':
+        with open('log.txt',"r") as f:
+            data = f.readlines()
+        return json.dumps(data,indent=4)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4545,debug=True)
+
